@@ -7,21 +7,21 @@ import { InjectModel } from "@nestjs/mongoose";
 export class ReferralService{
     constructor(
         @InjectModel(Referral.name)
-        private readonly referralModule:Model<Referral>
+        private readonly referralModel:Model<Referral>
     ){}
 
     async createReferralTracking(
-        referrrerId:string,
+        referrerId:string,
         referredUserId:string
     ){
 
         //1. prevent self-referral
-        if(referrrerId===referredUserId){
+        if(referrerId===referredUserId){
             throw new BadRequestException("you cannot refer yourself")
         }
 
-        //2. let's use existt() to prevent duplicates
-        const refExists=await this.referralModule.exists({
+        //2. let's use exist() to prevent duplicates
+        const refExists=await this.referralModel.exists({
             referredUserId:referredUserId
         })
 
@@ -29,8 +29,8 @@ export class ReferralService{
             throw new BadRequestException("this user has already been referred by someone")
         }
 
-        const referral=await this.referralModule.create({
-            referrerId:referrrerId,
+        const referral=await this.referralModel.create({
+            referrerId:referrerId,
             referredUserId:referredUserId
         })
 
