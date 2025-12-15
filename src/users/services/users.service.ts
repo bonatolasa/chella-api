@@ -7,12 +7,16 @@ import * as bcrypt from 'bcrypt';
 import { CommonUtils } from "src/commons/utils";
 import { UserResponse } from "../responses/users.response";
 import { access } from "fs";
+import { Referral } from "src/referals/schemas/referrals.schema";
+import { ReferralService } from "src/referals/services/referals.service";
 
 @Injectable()
 export class UsersService{
     constructor(
        @InjectModel(User.name)
         private readonly userModel: Model<User>,
+
+        private readonly referralService: ReferralService,
     ){}
 
     async registerUser(createUserDto:CreateUserDto){
@@ -27,24 +31,34 @@ export class UsersService{
             throw new BadRequestException("Username already taken, please choose another one");
         }
 
+        let referringUser=null as any;
+
+        if(createUserDto.refferedBy){
+            referringUser=await this.userModel.findOne({referralCode:createUserDto.refferedBy})
+
+            if(!referringUser){
+                throw new BadRequestException("Invalid referral code")
+            }
+        }
+
         //2 Hash the password
         const hashedpwd=await bcrypt.hash(createUserDto.password,10);
 
         //3 generate refferal
         const referalCode=CommonUtils.generateReferralCode();
 
-        //! we will implement a code to increase amount for reffering users
-        if(createUserDto.refferedBy){
-            const referringUser=await this.userModel.findOne({referralCode:createUserDto.refferedBy})
+        // //! we will implement a code to increase amount for reffering users
+        // if(createUserDto.refferedBy){
+        //     const referringUser=await this.userModel.findOne({referralCode:createUserDto.refferedBy})
 
-            if(referringUser){
-                await this.userModel.findByIdAndUpdate(referringUser._id,{
-                    totalEarned:referringUser.totalEarned + 20,
-                    amount:referringUser.amount+ 20,
-                    totalReffered:referringUser.totalReffered+1
-                })
-            }
-        }
+        //     if(referringUser){
+        //         await this.userModel.findByIdAndUpdate(referringUser._id,{
+        //             totalEarned:referringUser.totalEarned + 20,
+        //             amount:referringUser.amount+ 20,
+        //             totalReffered:referringUser.totalReffered+1
+        //         })
+        //     }
+        // }
 
         //4 prepare an instance to save on db
         const newUser = new this.userModel({
@@ -59,7 +73,21 @@ export class UsersService{
         })
         // 5 save to db
         const savedUser=await newUser.save()
-        console.log("Saved user", savedUser);
+        // console.log("Saved user", savedUser);
+
+        //! we will implement a code to increase amount for reffering users
+        if(referringUser){
+            await this.referralService.createReferralTracking(
+                referringUser._id.toString(),
+                savedUser._id.toString()
+            )
+
+            await this.userModel.findByIdAndUpdate(referringUser._id,{
+                totalEarned:referringUser.totalEarned + 20,
+                amount:referringUser.amount+20,
+                totalReffered:referringUser.totalReffered+1
+            })
+        }
 
         //6. map to our user reponse intercepter
         const UserResponse:UserResponse={
