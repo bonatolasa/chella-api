@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { Referral } from "../schemas/referrals.schema";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 
 @Injectable()
@@ -30,8 +30,8 @@ export class ReferralService{
         }
 
         const referral=await this.referralModel.create({
-            referrerId:referrerId,
-            referredUserId:referredUserId
+            referrerId:new Types.ObjectId( referrerId),
+            referredUserId:new Types.ObjectId(referredUserId)
         })
 
         return referral.save()
