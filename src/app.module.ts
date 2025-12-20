@@ -10,12 +10,14 @@ import { CommonsModule } from './commons/commons.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtStrategy } from './commons/guards/jwt_strategy';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal:true}),
     MongooseModule.forRoot(process.env.MONGO_URL || ""),
-    UsersModule, ReferalsModule, TasksModule, TransactionsModule, ExchangeRatesModule, CommonsModule],
+    UsersModule, ReferalsModule, TasksModule, TransactionsModule, ExchangeRatesModule, CommonsModule,
+    ScheduleModule.forRoot()],
   controllers: [AppController],
   providers: [AppService,JwtStrategy],
 })
