@@ -1,6 +1,7 @@
-import { Controller, Get, Patch } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Req } from "@nestjs/common";
 import { TasksService } from "../services/tasks.service";
 import { request } from "http";
+import { JwtAuthGuard } from "src/commons/guards/jwtauth.guard";
 
 @Controller('tasks')
 export class TasksController{
@@ -14,15 +15,19 @@ export class TasksController{
         return result
     }
 
-    @Patch('complete-daily-tasks')
-    async completeDailyTasks(){
-        const result=await this.tasksService.completeTask(request['userId'],request['taskId'])
+    @JwtAuthGuard()
+    @Patch('complete-task/:taskId')
+    async completeDailyTasks(@Req() req: any, @Param('taskId') taskId:string){
+        const currentUser=req.user;
+        const result=await this.tasksService.completeTask(currentUser,taskId) 
         return result
     }
 
-    @Get('get-user-tasks')
-    async getUserTasks(){
-        const result=await this.tasksService.getUserCompletedTasks(request['userId'])
+    @JwtAuthGuard()
+    @Get('user')
+    async getUserTasks(@Req() req: any){
+        const currentUser=req.user;
+        const result=await this.tasksService.getUserCompletedTasks(currentUser)
         return result
     }
 }
