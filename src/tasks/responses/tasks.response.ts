@@ -3,11 +3,5 @@ export class TaskResponse{
     title?:string;
     rewardAmount?:number;
     taskDate?:Date;
-}
-
-export class UserTaskResponse{
-    id:string;
-    taskId?:string;
-    TaskDate?:Date;
-    rewardAmount?:number
+    isCompleted?:boolean;
 }
