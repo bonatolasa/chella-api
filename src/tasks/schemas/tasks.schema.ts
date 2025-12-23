@@ -8,13 +8,13 @@ import { Document } from "mongoose";
         @Prop() taskDate:Date
     }
 
-    export const TaskSchema= SchemaFactory.createForClass(Task)
+    export const taskSchema= SchemaFactory.createForClass(Task)
 
-    @Schema({timestamps:true})
-    export class UserTask extends Document {
-        @Prop() userId: string;
-        @Prop() taskId: string;
-        @Prop() isCompleted: boolean;
-    }
+@Schema({ timestamps: true })
+   export class UserTask extends Document {
+         @Prop() userId: string;
+         @Prop() taskId: string;
+         @Prop({ default:false}) isCompleted:boolean
+}
 
     export const UserTasksSchema= SchemaFactory.createForClass(UserTask)
