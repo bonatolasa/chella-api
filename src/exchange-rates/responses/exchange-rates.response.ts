@@ -1,5 +1,9 @@
-export class ExchangeRatesResponse{
-    base:string;
-    date:string;
-    rates:Record<string,number>;
+export class ExchangeRatesResponse {
+  base: string;
+  date: string;
+  rates: {
+    USD: number;
+    EUR: number;
+    ETB: number;
+  };
 }
