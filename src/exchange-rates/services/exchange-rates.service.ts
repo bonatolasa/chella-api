@@ -4,6 +4,7 @@ import { ExchangeRate } from "../schemas/exchage-rates.schema";
 import { HttpService } from "@nestjs/axios";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { Model } from "mongoose";
+import { ExchangeRatesResponse } from "../responses/exchange-rates.response";
 
 @Injectable()
 export class ExchangeRatesService{
@@ -51,11 +52,23 @@ export class ExchangeRatesService{
   }
 
   //get latest exchange rate
-  async getLatestExchangeRate(){
-    const latestRate=await this.rateModel
+ async getLatestExchangeRate() {
+  const latestRate = await this.rateModel
     .findOne()
-    .sort({exchangeDate:-1})
+    .sort({ exchangeDate: -1 })
     .exec();
-    return latestRate;
+
+  if (!latestRate) {
+    throw new Error("No exchange rate data found");
   }
+
+const response: ExchangeRatesResponse = {
+   base: latestRate.baseCurrency,
+    date: latestRate.exchangeDate.toISOString(), // convert Date → string 
+    rates: { USD: latestRate.usdRate, EUR: latestRate.eurRate, ETB: latestRate.etbRate, }, 
+  };
+
+  return response;
+}
+
 }
