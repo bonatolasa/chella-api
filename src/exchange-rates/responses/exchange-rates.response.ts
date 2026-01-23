@@ -1,9 +1,13 @@
 export class ExchangeRatesResponse {
-  base: string;
-  date: string;
-  rates: {
-    USD: number;
-    EUR: number;
-    ETB: number;
-  };
+id: string;
+usdRate: number;
+eurRate: number;
+etbRate: number;
+exchangeDate: Date;
+}
+
+export class ConversionResponse{
+  fromCurrency:string;
+  toCurrency:string;
+  amount:number;
 }

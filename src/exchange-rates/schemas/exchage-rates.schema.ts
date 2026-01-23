@@ -3,7 +3,7 @@ import { Document } from "mongoose";
 
 @Schema()
 export class ExchangeRate extends Document{
-  @Prop()
+  @Prop({ default: "ETB" })
   baseCurrency:string;
   @Prop() usdRate:number;
   @Prop() eurRate:number;
